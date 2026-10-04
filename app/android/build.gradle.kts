@@ -52,7 +52,8 @@ android {
     val keystorePwd = properties.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS")
     val alias = properties.getProperty("KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
     val pwd = properties.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
-    if (keystorePath != null) {
+    val hasValidKeystore = keystorePath != null && file(keystorePath).let { it.exists() && it.isFile && it.length() > 0 } && !alias.isNullOrBlank()
+    if (hasValidKeystore) {
         signingConfigs {
             register("github") {
                 storeFile = file(keystorePath)
@@ -78,10 +79,10 @@ android {
             isShrinkResources = true
             vcsInfo.include = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules-android.pro")
-            signingConfig = signingConfigs.getByName(if (keystorePath != null) "github" else "debug")
+            signingConfig = signingConfigs.getByName(if (hasValidKeystore) "github" else "debug")
         }
         debug {
-            if (keystorePath != null) signingConfig = signingConfigs.getByName("github")
+            if (hasValidKeystore) signingConfig = signingConfigs.getByName("github")
         }
     }
 
