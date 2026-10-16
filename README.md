@@ -224,3 +224,11 @@ AppMarket 能解析各家应用商店的应用详情链接，并在应用内打�
 
 1. **用途限制**：本项目仅供技术研究学习及交流使用，严禁用于任何商业用途或非法牟利行为。
 2. **商标与版权**：文中提及的 Xiaomi、vivo、OPPO、Honor、Huawei、Samsung、TapTap、豌豆荚等商标及产品名称，其商标权与著作权均归其合法所有者所有。
+
+---
+
+## 开源许可
+
+本项目基于 [Apache License 2.0](LICENSE) 许可证开源。
+Copyright (c) 2026 Neko Beillc (HSSkyBoy) & AppMarket contributors.
+
