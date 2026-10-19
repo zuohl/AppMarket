@@ -184,6 +184,11 @@
     <string name="source_huawei">華為</string>
     <string name="source_taptap">TapTap</string>
     <string name="source_box7723">7723</string>
+    <string name="source_fdroid">F-Droid</string>
+    <string name="fdroid_mirror">F-Droid 鏡像源</string>
+    <string name="fdroid_mirror_summary">揀選 F-Droid 應用下載同元數據使用嘅國內鏡像</string>
+    <string name="fdroid_mirror_nju">南京大學 (NJU)</string>
+    <string name="fdroid_mirror_tuna">清華大學 (TUNA)</string>
     <string name="historical_versions">歷史版本</string>
     <string name="historical_versions_summary">睇返所有版本</string>
     <string name="historical_versions_title">%1$s嘅歷史版本</string>

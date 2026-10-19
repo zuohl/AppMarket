@@ -69,6 +69,8 @@ internal class UpdatePreferencesRepositoryImpl(
     override val categorySource: StateFlow<AppSource> = _categorySource.asStateFlow()
     private val _updateSource = MutableStateFlow(AppSource.DefaultUpdateSource)
     override val updateSource: StateFlow<AppSource> = _updateSource.asStateFlow()
+    private val _fdroidMirror = MutableStateFlow(top.app.market.domain.model.preference.FDroidMirror.Default)
+    override val fdroidMirror: StateFlow<top.app.market.domain.model.preference.FDroidMirror> = _fdroidMirror.asStateFlow()
     private val _permanentIgnores = MutableStateFlow<List<IgnoredUpdate>>(emptyList())
     override val permanentIgnores: StateFlow<List<IgnoredUpdate>> = _permanentIgnores.asStateFlow()
     private val _onceIgnores = MutableStateFlow<List<IgnoredUpdate>>(emptyList())
@@ -105,6 +107,9 @@ internal class UpdatePreferencesRepositoryImpl(
             },
             observe("updateSource", preferences.observe(UpdatePreferenceKeys.UpdateSource)) {
                 _updateSource.value = AppSource.fromToken(it) ?: AppSource.DefaultUpdateSource
+            },
+            observe("fdroidMirror", preferences.observe(UpdatePreferenceKeys.FDroidMirror)) {
+                _fdroidMirror.value = top.app.market.domain.model.preference.FDroidMirror.fromToken(it)
             },
             observe("permanentIgnores", preferences.observe(UpdatePreferenceKeys.PermanentIgnores)) {
                 _permanentIgnores.value = parseIgnored(it)
@@ -183,6 +188,9 @@ internal class UpdatePreferencesRepositoryImpl(
 
     override suspend fun setUpdateSource(value: AppSource) =
         preferences.put(UpdatePreferenceKeys.UpdateSource, value.token)
+
+    override suspend fun setFDroidMirror(value: top.app.market.domain.model.preference.FDroidMirror) =
+        preferences.put(UpdatePreferenceKeys.FDroidMirror, value.token)
 
     override fun isIgnored(app: MarketAppInfo): Boolean {
         if (_permanentIgnores.value.any { it.packageName == app.packageName }) return true

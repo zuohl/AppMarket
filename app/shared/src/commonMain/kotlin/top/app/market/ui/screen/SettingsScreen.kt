@@ -146,6 +146,11 @@ import top.app.market.resources.theme_predictive_back
 import top.app.market.resources.theme_predictive_back_summary
 import top.app.market.resources.theme
 import top.app.market.resources.theme_summary
+import top.app.market.domain.model.preference.FDroidMirror
+import top.app.market.resources.fdroid_mirror
+import top.app.market.resources.fdroid_mirror_nju
+import top.app.market.resources.fdroid_mirror_summary
+import top.app.market.resources.fdroid_mirror_tuna
 import top.app.market.resources.category_source
 import top.app.market.resources.category_source_summary
 import top.app.market.resources.today_source
@@ -204,6 +209,7 @@ fun SettingsTab(
     val searchSources by updatesViewModel.searchSources.collectAsStateWithLifecycle()
     val todaySource by updatesViewModel.todaySource.collectAsStateWithLifecycle()
     val categorySource by updatesViewModel.categorySource.collectAsStateWithLifecycle()
+    val fdroidMirror by updatesViewModel.fdroidMirror.collectAsStateWithLifecycle()
     val showAppComments by updatesViewModel.showAppComments.collectAsStateWithLifecycle()
     val showSameDeveloper by updatesViewModel.showSameDeveloper.collectAsStateWithLifecycle()
     val showPromotions by updatesViewModel.showPromotions.collectAsStateWithLifecycle()
@@ -245,6 +251,7 @@ fun SettingsTab(
         selectedUpdateSource = selectedUpdateSource,
         todaySource = todaySource,
         categorySource = categorySource,
+        fdroidMirror = fdroidMirror,
         appLanguage = appLanguage,
         showPromotions = showPromotions,
         showAppComments = showAppComments,
@@ -363,6 +370,20 @@ fun SettingsTab(
                         selectedIndex = sourceOptions.indexOf(selectedSource),
                         onSelectedIndexChange = { updatesViewModel.setSearchSource(sourceOptions[it]) },
                     )
+                    if (selectedSource == AppSource.FDROID) {
+                        val mirrorOptions = FDroidMirror.entries
+                        val mirrorLabels = listOf(
+                            stringResource(Res.string.fdroid_mirror_nju),
+                            stringResource(Res.string.fdroid_mirror_tuna),
+                        )
+                        WindowDropdownPreference(
+                            title = stringResource(Res.string.fdroid_mirror),
+                            summary = stringResource(Res.string.fdroid_mirror_summary),
+                            items = mirrorLabels,
+                            selectedIndex = mirrorOptions.indexOf(fdroidMirror).coerceAtLeast(0),
+                            onSelectedIndexChange = { updatesViewModel.setFDroidMirror(mirrorOptions[it]) },
+                        )
+                    }
                 }
             }
 
@@ -675,6 +696,7 @@ private fun settingsSearchEntries(
     selectedUpdateSource: AppSource,
     todaySource: AppSource,
     categorySource: AppSource,
+    fdroidMirror: FDroidMirror,
     appLanguage: String?,
     showPromotions: Boolean,
     showAppComments: Boolean,
@@ -774,6 +796,22 @@ private fun settingsSearchEntries(
                 onSelect = { index -> updatesViewModel.setSearchSource(sourceOptions[index]) },
             )
         )
+        if (selectedSource == AppSource.FDROID) {
+            val mirrorOptions = FDroidMirror.entries
+            val mirrorLabels = listOf(
+                stringResource(Res.string.fdroid_mirror_nju),
+                stringResource(Res.string.fdroid_mirror_tuna),
+            )
+            add(
+                SettingsSearchEntry.Dropdown(
+                    title = stringResource(Res.string.fdroid_mirror),
+                    summary = stringResource(Res.string.fdroid_mirror_summary),
+                    items = mirrorLabels,
+                    selectedIndex = mirrorOptions.indexOf(fdroidMirror).coerceAtLeast(0),
+                    onSelect = { index -> updatesViewModel.setFDroidMirror(mirrorOptions[index]) },
+                )
+            )
+        }
         if (appManagementSupported) {
             add(
                 switchEntry(

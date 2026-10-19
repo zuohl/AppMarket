@@ -40,6 +40,7 @@ internal class MarketSourceRepositoryImpl(
     private val huawei: HuaweiRepository,
     private val tapTap: TapTapRepository,
     private val box7723: top.app.market.domain.repository.Box7723Repository,
+    private val fdroid: top.app.market.domain.repository.FDroidRepository,
 ) : MarketSourceRepository {
     override suspend fun search(source: AppSource, keyword: String, page: Int): SearchPage = when (source) {
         AppSource.XIAOMI -> market.search(keyword, page)
@@ -51,6 +52,7 @@ internal class MarketSourceRepositoryImpl(
         AppSource.HUAWEI -> huawei.search(keyword, page)
         AppSource.TAPTAP -> tapTap.search(keyword, page)
         AppSource.BOX7723 -> box7723.search(keyword, page)
+        AppSource.FDROID -> fdroid.search(keyword, page)
     }
 
     override suspend fun categoryApps(
@@ -100,6 +102,7 @@ internal class MarketSourceRepositoryImpl(
         AppSource.BOX7723 -> box7723.appDetail(
             resolveStoreAppId(source, packageName, appId) { box7723.search(it, 0) },
         )
+        AppSource.FDROID -> fdroid.appDetail(packageName)
     }
 
     override suspend fun appComments(source: AppSource, app: MarketAppInfo): AppComments {
@@ -124,13 +127,14 @@ internal class MarketSourceRepositoryImpl(
         AppSource.HUAWEI -> huawei.downloadMeta(app)
         AppSource.TAPTAP -> tapTap.downloadMeta(app)
         AppSource.BOX7723 -> box7723.downloadMeta(app)
+        AppSource.FDROID -> fdroid.downloadMeta(app)
     }
 
     override suspend fun downloadUpdateMeta(source: AppSource, app: MarketAppInfo): DownloadMeta = when (source) {
         AppSource.XIAOMI -> market.downloadUpdateMeta(app)
         AppSource.VIVO -> vivo.downloadUpdateMeta(app)
-        // 豌豆荚 / 7723 无原生更新元数据协议，回退小米商店解析
-        AppSource.WANDOUJIA, AppSource.BOX7723 -> market.downloadUpdateMeta(app.onXiaomi())
+        // 豌豆荚 / 7723 / F-Droid 无原生更新元数据协议，回退小米商店解析
+        AppSource.WANDOUJIA, AppSource.BOX7723, AppSource.FDROID -> market.downloadUpdateMeta(app.onXiaomi())
         AppSource.OPPO -> oppo.downloadUpdateMeta(app)
         AppSource.SAMSUNG -> samsung.downloadUpdateMeta(app)
         AppSource.HONOR -> honor.downloadUpdateMeta(app)
@@ -150,15 +154,15 @@ internal class MarketSourceRepositoryImpl(
         AppSource.HONOR -> flow { emit(honor.checkUpdates()) }
         AppSource.HUAWEI -> flow { emit(huawei.checkUpdates()) }
         AppSource.TAPTAP -> flow { emit(tapTap.checkUpdates()) }
-        AppSource.BOX7723 -> flow { emit(emptyList()) }
+        AppSource.BOX7723, AppSource.FDROID -> flow { emit(emptyList()) }
     }
 
     override suspend fun checkManualUpdate(source: AppSource, request: ManualUpdateRequest): ManualUpdateResult =
         when (source) {
             AppSource.XIAOMI -> market.checkManualUpdate(request)
             AppSource.VIVO -> vivo.checkManualUpdate(request)
-            // 豌豆荚 / 7723 无原生手动更新协议，回退小米商店解析
-            AppSource.WANDOUJIA, AppSource.BOX7723 -> market.checkManualUpdate(request)
+            // 豌豆荚 / 7723 / F-Droid 无原生手动更新协议，回退小米商店解析
+            AppSource.WANDOUJIA, AppSource.BOX7723, AppSource.FDROID -> market.checkManualUpdate(request)
             AppSource.OPPO -> oppo.checkManualUpdate(request)
             AppSource.SAMSUNG -> samsung.checkManualUpdate(request)
             AppSource.HONOR -> honor.checkManualUpdate(request)
@@ -169,8 +173,8 @@ internal class MarketSourceRepositoryImpl(
     override suspend fun goldMiFeed(source: AppSource, page: Int, pageSize: Int): TodayFeedPage =
         when (source) {
             AppSource.OPPO -> oppo.beautyFeed(page, pageSize)
-            // 豌豆荚 / 三星 / 华为 / 荣耀 / 7723 无独立今日内容，回退小米商店今日
-            AppSource.XIAOMI, AppSource.WANDOUJIA, AppSource.SAMSUNG, AppSource.HUAWEI, AppSource.HONOR, AppSource.BOX7723 ->
+            // 豌豆荚 / 三星 / 华为 / 荣耀 / 7723 / F-Droid 无独立今日内容，回退小米商店今日
+            AppSource.XIAOMI, AppSource.WANDOUJIA, AppSource.SAMSUNG, AppSource.HUAWEI, AppSource.HONOR, AppSource.BOX7723, AppSource.FDROID ->
                 today.goldMiFeed(page, pageSize)
 
             AppSource.VIVO -> vivo.auroraFeed(page, pageSize)
@@ -180,7 +184,7 @@ internal class MarketSourceRepositoryImpl(
     override suspend fun todayArticle(source: AppSource, rId: String): TodayArticle =
         when (source) {
             AppSource.OPPO -> oppo.beautyArticle(rId)
-            AppSource.XIAOMI, AppSource.WANDOUJIA, AppSource.SAMSUNG, AppSource.HUAWEI, AppSource.HONOR, AppSource.BOX7723 ->
+            AppSource.XIAOMI, AppSource.WANDOUJIA, AppSource.SAMSUNG, AppSource.HUAWEI, AppSource.HONOR, AppSource.BOX7723, AppSource.FDROID ->
                 today.todayArticle(rId)
 
             AppSource.VIVO -> vivo.auroraArticle(rId)

@@ -25,6 +25,7 @@ interface UpdatePreferencesRepository {
     val todaySource: StateFlow<AppSource>
     val categorySource: StateFlow<AppSource>
     val updateSource: StateFlow<AppSource>
+    val fdroidMirror: StateFlow<top.app.market.domain.model.preference.FDroidMirror>
     val permanentIgnores: StateFlow<List<IgnoredUpdate>>
     val onceIgnores: StateFlow<List<IgnoredUpdate>>
     suspend fun setShowSystemUpdates(value: Boolean)
@@ -45,6 +46,7 @@ interface UpdatePreferencesRepository {
     suspend fun setTodaySource(value: AppSource)
     suspend fun setCategorySource(value: AppSource)
     suspend fun setUpdateSource(value: AppSource)
+    suspend fun setFDroidMirror(value: top.app.market.domain.model.preference.FDroidMirror)
     fun isIgnored(app: MarketAppInfo): Boolean
     suspend fun ignoreOnce(app: MarketAppInfo)
     suspend fun ignorePermanently(app: MarketAppInfo)

@@ -1,4 +1,4 @@
-﻿package top.app.market.viewmodel
+package top.app.market.viewmodel
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -71,6 +71,7 @@ class UpdatesViewModel(
     val todaySource: StateFlow<AppSource> = prefs.todaySource
     val categorySource: StateFlow<AppSource> = prefs.categorySource
     val updateSource: StateFlow<AppSource> = prefs.updateSource
+    val fdroidMirror: StateFlow<top.app.market.domain.model.preference.FDroidMirror> = prefs.fdroidMirror
 
     // App-detail display toggles; consumed by the detail screen, surfaced here for the settings UI.
     val showAppComments: StateFlow<Boolean> = prefs.showAppComments
@@ -152,6 +153,7 @@ class UpdatesViewModel(
     fun setTodaySource(value: AppSource) = persist { prefs.setTodaySource(value) }
     fun setCategorySource(value: AppSource) = persist { prefs.setCategorySource(value) }
     fun setUpdateSource(value: AppSource) = persist { prefs.setUpdateSource(value) }
+    fun setFDroidMirror(value: top.app.market.domain.model.preference.FDroidMirror) = persist { prefs.setFDroidMirror(value) }
 
     fun startInitialCheck() {
         if (initialCheckStarted) return

@@ -20,6 +20,7 @@ object UpdatePreferenceKeys {
     val TodaySource = StringPreferenceKey(NS, "today_source")
     val CategorySource = StringPreferenceKey(NS, "category_source")
     val UpdateSource = StringPreferenceKey(NS, "update_source")
+    val FDroidMirror = StringPreferenceKey(NS, "fdroid_mirror")
     val PermanentIgnores = StringPreferenceKey(NS, "permanent_ignores")
     val OnceIgnores = StringPreferenceKey(NS, "once_ignores")
     val CachedUpdates = StringPreferenceKey(NS, "cached_updates")

@@ -50,6 +50,10 @@ class InstallerAttributionResolverTest {
         )
         assertEquals(
             StorePackageNames.GOOGLE_PLAY,
+            InstallerAttributionResolver.resolve(InstallerAttributionMode.AUTO_BY_SOURCE, AppSource.FDROID),
+        )
+        assertEquals(
+            StorePackageNames.GOOGLE_PLAY,
             InstallerAttributionResolver.resolve(InstallerAttributionMode.AUTO_BY_SOURCE, null),
         )
     }

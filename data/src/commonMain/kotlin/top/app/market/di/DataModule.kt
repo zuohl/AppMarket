@@ -21,8 +21,11 @@ import top.app.market.data.remote.xiaomi.XiaomiClient
 import top.app.market.data.remote.xiaomi.XiaomiHttpClient
 import top.app.market.data.remote.box7723.Box7723Api
 import top.app.market.data.remote.box7723.Box7723ApiConfig
+import top.app.market.data.remote.fdroid.FDroidApi
+import top.app.market.data.remote.fdroid.FDroidApiConfig
 import top.app.market.data.repository.AnonymousAccountRepositoryImpl
 import top.app.market.data.repository.Box7723RepositoryImpl
+import top.app.market.data.repository.FDroidRepositoryImpl
 import top.app.market.data.repository.HonorRepositoryImpl
 import top.app.market.data.repository.HuaweiRepositoryImpl
 import top.app.market.data.repository.MarketLinkResolverImpl
@@ -42,6 +45,7 @@ import top.app.market.data.store.UpdatePreferencesRepositoryImpl
 import top.app.market.domain.repository.AccountRepository
 import top.app.market.domain.repository.Box7723Repository
 import top.app.market.domain.repository.DownloadRepository
+import top.app.market.domain.repository.FDroidRepository
 import top.app.market.domain.repository.HonorRepository
 import top.app.market.domain.repository.HuaweiRepository
 import top.app.market.domain.repository.MarketLinkResolver
@@ -115,6 +119,9 @@ private val commonDataModule = module {
     single { Box7723ApiConfig() }
     singleOf(::Box7723Api)
     singleOf(::Box7723RepositoryImpl) { bind<Box7723Repository>() }
+    single { FDroidApiConfig() }
+    singleOf(::FDroidApi)
+    singleOf(::FDroidRepositoryImpl) { bind<FDroidRepository>() }
     singleOf(::MarketSourceRepositoryImpl) { bind<MarketSourceRepository>() }
 
     singleOf(::RecordingDownloadRepositoryImpl) { bind<DownloadRepository>() }

@@ -74,9 +74,52 @@
 | **荣耀应用市场** (Honor)   |   `honor`   |     ✅      |    ✅    |    ✅    |    ❌    |     ❌      |    ❌     |    ❌    |    ✅    |
 | **三星应用商店** (Samsung) |  `samsung`  |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
 | **豌豆荚** (Wandoujia)     | `wandoujia` |     ✅      |   ✅\*   |    ❌    |    ✅    |     ❌      |    ❌     |    ❌    |    —     |
+| **7723 游戏盒** (7723)      |   `7723`    |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **F-Droid** (开源镜像源)    |  `fdroid`   |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
 
-> _\* 注：豌豆荚无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
+> _\* 注：豌豆荚 / 7723 / F-Droid 无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
 > _分区浏览（「游戏」「应用」页）无原生接口的来源会自动回退到小米官方分类。_
+
+### F-Droid 镜像源与自建配置
+
+为了解决国内网络访问官方 F-Droid 缓慢或受限的问题，AppMarket 的 F-Droid 来源**默认完全使用国内优质镜像源**下载 APK 与中继数据，并在客户端「设置 - 搜索来源 - F-Droid 镜像源」中提供可视化切换：
+
+- **南京大学开源镜像站 (NJU)**：`https://mirror.nju.edu.cn/fdroid/repo`（默认推荐，CDN 加速支持）
+- **清华大学开源软件镜像站 (TUNA)**：`https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo`（权威稳定同步源）
+
+#### 自行增加或修改镜像源
+
+开发者或自建内网 F-Droid 仓库的用户，可以通过修改枚举非常简单地增加或替换镜像源：
+
+1. 打开 [FDroidMirror.kt](domain/src/commonMain/kotlin/top/app/market/domain/model/preference/FDroidMirror.kt)。
+2. 在 `FDroidMirror` 枚举中添加新节点，填入标识 `token`、显示名称 `displayName` 以及仓库路径 `repoBaseUrl`（需以 `/fdroid/repo` 结尾）：
+
+```kotlin
+enum class FDroidMirror(
+    val token: String,
+    val displayName: String,
+    val repoBaseUrl: String,
+) {
+    NJU(
+        token = "nju",
+        displayName = "南京大学镜像源 (NJU)",
+        repoBaseUrl = "https://mirror.nju.edu.cn/fdroid/repo",
+    ),
+    TUNA(
+        token = "tuna",
+        displayName = "清华大学开源软件镜像站 (TUNA)",
+        repoBaseUrl = "https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo",
+    ),
+    // 示例：自行添加北京外国语大学或自建局域网源
+    BFSU(
+        token = "bfsu",
+        displayName = "北京外国语大学 (BFSU)",
+        repoBaseUrl = "https://mirrors.bfsu.edu.cn/fdroid/repo",
+    );
+}
+```
+
+3. 在 [SettingsScreen.kt](app/shared/src/commonMain/kotlin/top/app/market/ui/screen/SettingsScreen.kt) 对应的字符串资源（或直接引用 `mirror.displayName`）中加入显示，编译后即可在设置界面中选择新源。
 
 ---
 

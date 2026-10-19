@@ -1,4 +1,4 @@
-﻿package top.app.market.viewmodel
+package top.app.market.viewmodel
 
 import top.app.market.domain.model.download.DownloadMeta
 import top.app.market.domain.model.download.DownloadState
@@ -235,8 +235,13 @@ private class SearchPreferences : UpdatePreferencesRepository {
     override val todaySource = MutableStateFlow(AppSource.HONOR)
     override val categorySource = MutableStateFlow(AppSource.XIAOMI)
     override val updateSource = MutableStateFlow(AppSource.HONOR)
+    override val fdroidMirror = MutableStateFlow(top.app.market.domain.model.preference.FDroidMirror.Default)
     override val permanentIgnores: StateFlow<List<IgnoredUpdate>> = MutableStateFlow(emptyList())
     override val onceIgnores: StateFlow<List<IgnoredUpdate>> = MutableStateFlow(emptyList())
+
+    override suspend fun setFDroidMirror(value: top.app.market.domain.model.preference.FDroidMirror) {
+        fdroidMirror.value = value
+    }
 
     override suspend fun setShowSystemUpdates(value: Boolean) {
         showSystemUpdates.value = value

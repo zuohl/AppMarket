@@ -1,4 +1,4 @@
-﻿package top.app.market.data.store
+package top.app.market.data.store
 
 import top.app.market.data.local.BooleanPreferenceKey
 import top.app.market.data.local.PreferenceChanges
@@ -277,6 +277,7 @@ private class ControlledPreferencesDataSource(
         emit(UpdatePreferenceKeys.TodaySource, "")
         emit(UpdatePreferenceKeys.CategorySource, "")
         emit(UpdatePreferenceKeys.UpdateSource, "")
+        emit(UpdatePreferenceKeys.FDroidMirror, "")
         emit(UpdatePreferenceKeys.PermanentIgnores, "[]")
         emit(UpdatePreferenceKeys.OnceIgnores, "[]")
     }
