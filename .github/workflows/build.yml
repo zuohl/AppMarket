@@ -1,0 +1,154 @@
+name: CI & Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    tags:
+      - "v*"
+    paths-ignore:
+      - "README.md"
+      - "doc/*"
+      - ".github/workflows/build.yml"
+
+jobs:
+  build-android:
+    name: Build Android
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: "zulu"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Decode Signing Key
+        shell: bash
+        run: echo "${{ secrets.SIGNING_KEY }}" | base64 -d > keystore.jks
+
+      - name: Verify Tag Matches Version
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        shell: bash
+        run: |
+          VERSION=$(grep '^APP_VERSION_NAME=' gradle.properties | cut -d= -f2)
+          if [ "$GITHUB_REF_NAME" != "v$VERSION" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match APP_VERSION_NAME=$VERSION in gradle.properties"
+            exit 1
+          fi
+
+      - name: Build Release APK
+        shell: bash
+        run: |
+          ./gradlew :app:android:assembleRelease
+          APK_PATH=$(find app/android/build/outputs/apk/release -name '*.apk' | head -n 1)
+          echo "APK_FILE=$APK_PATH" >> $GITHUB_ENV
+        env:
+          COMMIT_ID: ${{ !startsWith(github.ref, 'refs/tags/') && github.sha || '' }}
+          KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          KEYSTORE_PASS: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: appmarket-android
+          path: ${{ env.APK_FILE }}
+          if-no-files-found: error
+
+      - name: Display APK Hashes
+        shell: bash
+        run: |
+          echo "### APK Hashes" >> $GITHUB_STEP_SUMMARY
+          echo "| Hash Type | Hash Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| SHA256 | \`$(sha256sum "$APK_FILE" | awk '{ print $1 }')\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| SHA1 | \`$(sha1sum "$APK_FILE" | awk '{ print $1 }')\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| MD5 | \`$(md5sum "$APK_FILE" | awk '{ print $1 }')\` |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Release (Android)
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK_FILE" --clobber
+          else
+            gh release create "$TAG" "$APK_FILE" --title "$TAG" --generate-notes
+          fi
+
+  build-desktop:
+    name: Build Desktop (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    needs: build-android
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            os: windows-latest
+            artifact-pattern: app/desktop/build/compose/binaries/main-release/msi/*.msi
+            artifact-name: appmarket-desktop-windows
+
+          - target: linux-x64
+            os: ubuntu-latest
+            artifact-pattern: app/desktop/build/compose/binaries/main-release/deb/*.deb
+            artifact-name: appmarket-desktop-linux
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: "zulu"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build Desktop Package
+        shell: bash
+        run: ./gradlew :app:desktop:packageReleaseDistributionForCurrentOS
+        env:
+          COMMIT_ID: ${{ !startsWith(github.ref, 'refs/tags/') && github.sha || '' }}
+
+      - name: Upload Desktop Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-pattern }}
+          if-no-files-found: error
+
+      - name: Publish Desktop Asset to Release
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          for file in ${{ matrix.artifact-pattern }}; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file to release $TAG..."
+              gh release upload "$TAG" "$file" --clobber
+            fi
+          done
