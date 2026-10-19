@@ -36,6 +36,7 @@
       - [Desktop 端](#desktop-端)
       - [Android 端](#android-端)
   - [运行要求](#运行要求)
+  - [更新日志](#更新日志)
   - [开源引用](#开源引用)
   - [免责声明](#免责声明)
 
@@ -246,6 +247,12 @@ AppMarket 能解析各家应用商店的应用详情链接，并在应用内打�
 | **Windows** | Windows 10 x64 / ARM64                     | 安装 JRE/JDK 21+                             |
 | **macOS**   | macOS 12 Monterey 以上                     | Apple Silicon (M系列) 或 Intel x86_64        |
 | **Linux**   | 主流现代发行版（Ubuntu 20.04+、Fedora 等） | 带有 X11 或 Wayland 环境                     |
+
+---
+
+## 更新日志
+
+各版本的详细更新说明与功能演进记录，请参阅 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 
