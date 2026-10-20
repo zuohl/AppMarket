@@ -83,7 +83,8 @@ composeCompiler {
 
 val generateVersionInfo = tasks.register<GenerateVersionInfoTask>("generateVersionInfo") {
     description = "generateVersionInfo"
-    versionName.set(ProjectConfig.VERSION_NAME)
+    appName.set(ProjectConfig.APP_NAME)
+    versionName.set(resolveVersionName())
     versionCode.set(resolveVersionCode())
     outputFile.set(generatedSrcDir.map { it.file("kotlin/misc/VersionInfo.kt") })
 }

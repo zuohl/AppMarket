@@ -1,0 +1,31 @@
+import org.gradle.api.Project
+
+/** 基础版本名，取自 gradle.properties 的 `APP_VERSION_NAME`。 */
+private fun Project.baseVersionName(): String =
+    providers.gradleProperty("APP_VERSION_NAME").get()
+
+private const val VERSION_CODE_BASE = 220
+
+private fun Project.gitCommitCount(): Int =
+    runCatching {
+        providers.exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+        }.standardOutput.asText.get().trim().toInt()
+    }.getOrDefault(0)
+
+fun Project.resolveVersionCode(): Int {
+    val floor = providers.gradleProperty("APP_VERSION_CODE").get().toInt()
+    val fromGit = gitCommitCount().takeIf { it > 0 }?.let { VERSION_CODE_BASE + it } ?: 0
+    return maxOf(floor, fromGit)
+}
+
+/**
+ * 展示用版本名：CI 非发版构建（设置了 `COMMIT_ID`）追加 `-<7 位提交>`，如 `2.3.3-e54a42c`；
+ * 发版构建和本机构建为纯 `APP_VERSION_NAME`。
+ */
+fun Project.resolveVersionName(): String {
+    val commit = providers.environmentVariable("COMMIT_ID").orNull?.trim()?.take(7)
+    return if (commit.isNullOrEmpty()) baseVersionName() else "${baseVersionName()}-$commit"
+}
+
+fun Project.resolvePackageVersion(): String = baseVersionName()

@@ -2,7 +2,7 @@
 
 基于 **Kotlin Multiplatform** 的现代化跨平台应用商店，支持 **Android** 与 **Desktop (JVM)**。采用 **miuix** 设计语言，拥有流畅优雅的视觉交互，聚合多家主流应用源。
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.10-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.0-blue?logo=jetpackcompose)](https://github.com/JetBrains/compose-multiplatform)
 [![miuix](https://img.shields.io/badge/UI-miuix-FF6900.svg)](https://github.com/compose-miuix-ui/miuix)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Desktop-green.svg)](https://github.com/YuKongA/AppMarket)
@@ -28,6 +28,7 @@
   - [目录](#目录)
   - [特性概览](#特性概览)
   - [支持的应用源](#支持的应用源)
+  - [商店链接识别](#商店链接识别)
   - [安装方式与安装器](#安装方式与安装器)
   - [编译与开发](#编译与开发)
     - [环境要求](#环境要求)
@@ -35,6 +36,7 @@
       - [Desktop 端](#desktop-端)
       - [Android 端](#android-端)
   - [运行要求](#运行要求)
+  - [更新日志](#更新日志)
   - [开源引用](#开源引用)
   - [免责声明](#免责声明)
 
@@ -42,7 +44,9 @@
 
 ## 特性概览
 
-- **多源聚合与自由定制**：支持独立为「搜索来源」、「更新来源」以及「今日来源」指定不同的商店源，各取所长。
+- **多源聚合与自由定制**：支持独立为「搜索来源」、「更新来源」、「今日来源」以及「分区来源」指定不同的商店源，各取所长。
+- **游戏 / 应用分区浏览**：小米官方细分类、TapTap 榜单（热门 / 新品 / 热卖）、华为应用榜与游戏榜、OPPO 服务端动态分类，支持下拉刷新。
+- **主题自定义**：莫奈取色（自定义主色 / 调色盘风格 / Material 3 2021·2025 规格）、深浅色模式、AMOLED 纯黑、设置页搜索。
 - **纯客户端增量更新**：内置多套差分算法还原引擎，可用时下载补丁包并于本地合成为完整 APK，节省 70%~90% 流量。
 - **全场景安装器支持**：支持系统标准 PackageInstaller、Shizuku 免 Root 静默安装、Root 极速静默安装以及第三方安装器交接。
 - **纯净体验与结果净化**：
@@ -50,27 +54,134 @@
   - **过滤快应用**：一键隐藏免安装快应用结果。
   - **过滤预约应用**：过滤尚未上线的预注册应用。
   - **优化应用名称**：智能裁剪应用名称后携带的营销副标题与推广宣传语。
+- **商店链接识别**：认得各家应用商店的链接（含分享文案中的链接），进入应用时可识别剪贴板并询问是否打开；Android 上可被选为这些链接的打开方式，详见 [商店链接识别](#商店链接识别)。
 - **历史版本回退**：接入海量应用历史库，支持按版本追溯并下载历史版本 APK。
 - **设备指纹与机型模拟**：内置预设及自定义 `MarketProfile`（机型、Android 版本、SDK、分辨率、区域等），解决特定厂商或生态专属应用不可见问题。
 - **系统生态深度优化**：支持小米 HyperOS 超级岛优化、焦点通知优化等。
+- **多语言**：简体中文、繁体中文（台湾 / 香港）、English，应用内可独立切换语言，不受系统语言限制。
 - **跨平台一致体验**：基于 Compose Multiplatform 打造，同时支持 Android 移动端与桌面端（Windows / macOS / Linux）。
 
 ---
 
 ## 支持的应用源
 
-| 应用源                     |    标识     | 搜索 / 详情 | 更新检查 | 增量更新 | 历史版本 |  今日精选   | 真实评论 | 区域切换 | 过滤净化 |
-| :------------------------- | :---------: | :---------: | :------: | :------: | :------: | :---------: | :------: | :------: | :------: |
-| **小米应用商店** (Xiaomi)  |  `xiaomi`   |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (金米奖) |    ✅    |    —     |    ✅    |
-| **vivo 应用商店** (vivo)   |   `vivo`    |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (极光奖) |    ❌    |    —     |    ✅    |
-| **OPPO 软件商店** (OPPO)   |   `oppo`    |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (至美奖) |    ✅    |    ✅    |    ✅    |
-| **TapTap**                 |  `taptap`   |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (推荐流) |    ❌    |    —     |    —     |
-| **华为应用市场** (Huawei)  |  `huawei`   |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌    |    —     |    ✅    |
-| **荣耀应用市场** (Honor)   |   `honor`   |     ✅      |    ✅    |    ✅    |    ❌    |     ❌      |    ❌    |    —     |    ✅    |
-| **三星应用商店** (Samsung) |  `samsung`  |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌    |    ✅    |    —     |
-| **豌豆荚** (Wandoujia)     | `wandoujia` |     ✅      |   ✅\*   |    ❌    |    ✅    |     ❌      |    ❌    |    —     |    —     |
+| 应用源                     |    标识     | 搜索 / 详情 | 更新检查 | 增量更新 | 历史版本 |  今日精选   | 分区浏览  | 真实评论 | 过滤净化 |
+| :------------------------- | :---------: | :---------: | :------: | :------: | :------: | :---------: | :-------: | :------: | :------: |
+| **小米应用商店** (Xiaomi)  |  `xiaomi`   |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (金米奖) | ✅ (细分类) |    ✅    |    ✅    |
+| **vivo 应用商店** (vivo)   |   `vivo`    |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (极光奖) |    ❌     |    ❌    |    ✅    |
+| **OPPO 软件商店** (OPPO)   |   `oppo`    |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (至美奖) | ✅ (动态大类) |    ✅    |    ✅    |
+| **TapTap**                 |  `taptap`   |     ✅      |    ✅    |    ✅    |    ❌    | ✅ (推荐流) | ✅ (仅游戏榜) |    ❌    |    —     |
+| **华为应用市场** (Huawei)  |  `huawei`   |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      | ✅ (应用/游戏榜) |    ❌    |    ✅    |
+| **荣耀应用市场** (Honor)   |   `honor`   |     ✅      |    ✅    |    ✅    |    ❌    |     ❌      |    ❌     |    ❌    |    ✅    |
+| **三星应用商店** (Samsung) |  `samsung`  |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **豌豆荚** (Wandoujia)     | `wandoujia` |     ✅      |   ✅\*   |    ❌    |    ✅    |     ❌      |    ❌     |    ❌    |    —     |
+| **7723 游戏盒** (7723)      |   `7723`    |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **F-Droid** (开源镜像源)    |  `fdroid`   |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
 
-> _\* 注：豌豆荚无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
+> _\* 注：豌豆荚 / 7723 / F-Droid 无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
+> _分区浏览（「游戏」「应用」页）无原生接口的来源会自动回退到小米官方分类。_
+
+### F-Droid 镜像源与自建配置
+
+为了解决国内网络访问官方 F-Droid 缓慢或受限的问题，AppMarket 的 F-Droid 来源**默认完全使用国内优质镜像源**下载 APK 与中继数据，并在客户端「设置 - 搜索来源 - F-Droid 镜像源」中提供可视化切换：
+
+- **南京大学开源镜像站 (NJU)**：`https://mirror.nju.edu.cn/fdroid/repo`（默认推荐，CDN 加速支持）
+- **清华大学开源软件镜像站 (TUNA)**：`https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo`（权威稳定同步源）
+
+#### 自行增加或修改镜像源
+
+开发者或自建内网 F-Droid 仓库的用户，可以通过修改枚举非常简单地增加或替换镜像源：
+
+1. 打开 [FDroidMirror.kt](domain/src/commonMain/kotlin/top/app/market/domain/model/preference/FDroidMirror.kt)。
+2. 在 `FDroidMirror` 枚举中添加新节点，填入标识 `token`、显示名称 `displayName` 以及仓库路径 `repoBaseUrl`（需以 `/fdroid/repo` 结尾）：
+
+```kotlin
+enum class FDroidMirror(
+    val token: String,
+    val displayName: String,
+    val repoBaseUrl: String,
+) {
+    NJU(
+        token = "nju",
+        displayName = "南京大学镜像源 (NJU)",
+        repoBaseUrl = "https://mirror.nju.edu.cn/fdroid/repo",
+    ),
+    TUNA(
+        token = "tuna",
+        displayName = "清华大学开源软件镜像站 (TUNA)",
+        repoBaseUrl = "https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo",
+    ),
+    // 示例：自行添加北京外国语大学或自建局域网源
+    BFSU(
+        token = "bfsu",
+        displayName = "北京外国语大学 (BFSU)",
+        repoBaseUrl = "https://mirrors.bfsu.edu.cn/fdroid/repo",
+    );
+}
+```
+
+3. 在 [SettingsScreen.kt](app/shared/src/commonMain/kotlin/top/app/market/ui/screen/SettingsScreen.kt) 对应的字符串资源（或直接引用 `mirror.displayName`）中加入显示，编译后即可在设置界面中选择新源。
+
+---
+
+## 商店链接识别
+
+AppMarket 能解析各家应用商店的应用详情链接，并在应用内打开对应详情页，有三个入口：
+
+- **系统链接**（Android）：在浏览器、聊天软件中点击商店链接，可选择用 AppMarket 打开。
+- **剪贴板识别**：进入应用（窗口获得焦点）时读取剪贴板，识别到商店链接就弹窗询问是否打开；同一链接只询问一次，可在 设置 中关闭「识别剪贴板中的商店链接」。Android 12 及以上读取剪贴板内容时系统会提示，因此仅在剪贴板内容变化时才读取。
+- **分享文案**：剪贴板里的整段文字（如「【微信】快来下载吧！https://app.mi.com/details?id=…」）也会被识别，取第一个可识别的链接。
+- **短链接**：华为应用市场「复制链接」得到的短链接（`url.cloud.huawei.com/xxxx`）会联网展开（跟随 302 跳转）后再识别。只会展开这个已知短链域名，不会去访问剪贴板里的其他网址。
+- **分享**：应用详情页右上角 ⋮ 菜单的「分享」，内容为「应用名 + 统一格式链接」；Android 拉起系统分享面板，桌面端复制到剪贴板。
+
+**统一格式**：`appmarket://details?id=<包名>&source=<来源标识>`，来源标识见上表。华为应用市场本身使用 `appmarket://details?id=`，因此不带 `source` 时按华为处理，两者相容。
+
+### 可识别的链接
+
+包名取自查询参数（`id`、`packageName`、`pkgName`、`pname`、`package`、`pkg` 等，含 `#` 之后的参数）或路径段（如三星 `/detail/<包名>`、豌豆荚 `/apps/<包名>`）。TapTap 只带站内 id 的链接（`/app/<id>`）也可打开。
+
+| 来源              | scheme                                    | 网页域名                                                  |
+| :---------------- | :---------------------------------------- | :-------------------------------------------------------- |
+| 统一格式          | `appmarket://`                            | —                                                         |
+| 小米              | `mimarket://`                             | `app.mi.com`、`app.xiaomi.com`                            |
+| 华为              | `hiapp://`、`hwmarket://`                 | `appgallery.huawei.com`、`appgallery.cloud.huawei.com`、`appstore.huawei.com` |
+| vivo              | `vivomarket://`                           | `vivo.com.cn`、`vivo.com`                                 |
+| OPPO              | `oppomarket://`、`heytapmarket://`、`oaps://` | `heytap.com`、`oppomobile.com`、`heytapmobi.com`      |
+| 荣耀              | `honormarket://`、`hnappmarket://`        | `hihonor.com`、`honor.com`                                |
+| 三星              | `samsungapps://`                          | `galaxystore.samsung.com`、`apps.samsung.com`             |
+| TapTap            | `taptap://`                               | `taptap.cn`、`taptap.com`、`taptap.io`                    |
+| 豌豆荚            | `wandoujia://`                            | `wandoujia.com`                                           |
+| 其他（无对应来源） | `market://`                               | `play.google.com`、`market.android.com`、`coolapk.com`    |
+
+华为分享链接常只带 `C` 开头的应用 id（如 `appgallery.huawei.com/app/C100404489`），同样可以识别，打开时通过华为网页版的应用信息接口换出包名再加载详情。只有域名匹配、但链接里既没有包名也取不到站内 id 的链接不会被识别。
+
+### 打开到哪个来源
+
+- 小米、华为、荣耀、TapTap：仅凭包名即可加载详情，在链接指明的来源中打开；华为、TapTap 只带站内 id 时也可打开。
+- vivo、OPPO、三星、豌豆荚：仅凭包名查不到详情，改由小米打开（TapTap 带站内 id 时除外）。
+- Google Play、酷安、通用 `market://`：无对应来源，由小米打开。
+
+### 系统打开方式（Android）
+
+`AndroidManifest.xml` 声明的范围是上表的子集：
+
+- **scheme**：`market`、`mimarket`（详情 / 搜索）；`appmarket`、`hiapp`、`hwmarket`、`vivomarket`、`oppomarket`、`heytapmarket`、`oaps`、`honormarket`、`hnappmarket`、`samsungapps`、`taptap`、`wandoujia`（不限 host）。
+- **网页**（按路径前缀限定，不接管整站）：
+
+  | 域名                                                   | 路径前缀              |
+  | :----------------------------------------------------- | :-------------------- |
+  | `m.app.mi.com`                                         | `/details`            |
+  | `app.xiaomi.com`                                       | `/`                   |
+  | `appgallery.huawei.com`、`appgallery.cloud.huawei.com` | `/appDetail`          |
+  | `h5.appstore.vivo.com.cn`                              | `/`                   |
+  | `galaxystore.samsung.com`                              | `/detail`             |
+  | `www.wandoujia.com`                                    | `/apps`               |
+  | `www.taptap.cn`、`www.taptap.com`                      | `/app`                |
+  | `play.google.com`                                      | `/store/apps/details` |
+  | `www.coolapk.com`                                      | `/apk`                |
+
+- 解析器认得、但 Manifest 未声明的网页链接（OPPO、荣耀的全部网页，以及 `appstore.huawei.com`、`apps.samsung.com`、`taptap.io`、`market.android.com`）：复制到剪贴板仍会被识别，但在浏览器中点击不会跳转到 AppMarket。
+- 网页链接未做域名验证，系统通常会弹出选择器，而不是直接用 AppMarket 打开。
 
 ---
 
@@ -139,6 +250,12 @@
 
 ---
 
+## 更新日志
+
+各版本的详细更新说明与功能演进记录，请参阅 [CHANGELOG.md](CHANGELOG.md)。
+
+---
+
 ## 开源引用
 
 - [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) - JetBrains 推出的声明式跨平台 UI 框架
@@ -157,3 +274,11 @@
 
 1. **用途限制**：本项目仅供技术研究学习及交流使用，严禁用于任何商业用途或非法牟利行为。
 2. **商标与版权**：文中提及的 Xiaomi、vivo、OPPO、Honor、Huawei、Samsung、TapTap、豌豆荚等商标及产品名称，其商标权与著作权均归其合法所有者所有。
+
+---
+
+## 开源许可
+
+本项目基于 [Apache License 2.0](LICENSE) 许可证开源。
+Copyright (c) 2026 Neko Beillc (HSSkyBoy) & AppMarket contributors.
+

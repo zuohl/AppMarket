@@ -34,11 +34,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = ProjectConfig.PACKAGE_NAME
+        applicationId = ProjectConfig.APPLICATION_ID
         minSdk = ProjectConfig.Android.MIN_SDK
         targetSdk = ProjectConfig.Android.TARGET_SDK
         versionCode = resolveVersionCode()
-        versionName = ProjectConfig.VERSION_NAME
+        versionName = resolveVersionName()
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -87,7 +87,7 @@ android {
     }
 
     androidResources {
-        localeFilters.addAll(listOf("en", "zh"))
+        localeFilters.addAll(listOf("en", "zh", "zh-rTW", "zh-rHK"))
     }
 
     dependenciesInfo {

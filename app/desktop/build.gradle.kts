@@ -28,7 +28,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.app.market.MainKt"
+        mainClass = "top.app.market.MainKt"
 
         buildTypes.release.proguard {
             optimize = false
@@ -39,7 +39,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = ProjectConfig.APP_NAME
-            packageVersion = ProjectConfig.VERSION_NAME
+            packageVersion = resolvePackageVersion()
         }
     }
 }

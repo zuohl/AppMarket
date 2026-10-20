@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">App Store</string>
 
     <!-- Navigation -->
     <string name="nav_today">Today</string>
+    <string name="nav_games">Games</string>
+    <string name="nav_apps">Apps</string>
     <string name="nav_updates">Updates</string>
     <string name="nav_search">Search</string>
     <string name="nav_settings">Settings</string>
@@ -33,6 +34,9 @@
     <string name="reinstall">Redownload</string>
     <string name="cancel_download">Cancel download</string>
     <string name="more_options">More options</string>
+    <string name="share">Share</string>
+    <string name="share_link_copied">Link copied</string>
+    <string name="share_failed">Couldn't share</string>
     <string name="open_in_other_app_store">Open in another app store</string>
     <string name="no_other_app_store">No other app store was found</string>
     <string name="save_image">Save image</string>
@@ -65,6 +69,27 @@
 
     <!-- Search -->
     <string name="search_hint">Search apps</string>
+    <string name="category_tools">Tools</string>
+    <string name="category_media">Media</string>
+    <string name="category_social">Social</string>
+    <string name="category_office">Productivity</string>
+    <string name="category_education">Education</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_sports">Sports</string>
+    <string name="ranking_hot">Hot</string>
+    <string name="ranking_new">New</string>
+    <string name="ranking_sell">Best sellers</string>
+    <string name="game_category_all">All</string>
+    <string name="game_category_strategy">Strategy</string>
+    <string name="game_category_action">Action</string>
+    <string name="game_category_racing">Racing &amp; Sports</string>
+    <string name="game_category_rpg">Online RPG</string>
+    <string name="game_category_card">Cards &amp; Board</string>
+    <string name="game_category_fighting">Fighting</string>
+    <string name="game_category_kids">Kids &amp; Puzzle</string>
+    <string name="game_category_casual">Casual</string>
+    <string name="game_category_flight">Flight</string>
+    <string name="game_category_runner">Runner</string>
     <string name="search_button">Search</string>
     <string name="no_results">No results</string>
     <string name="search_failed">Search failed</string>
@@ -76,6 +101,37 @@
     <string name="general">General</string>
     <string name="theme">Theme</string>
     <string name="theme_summary">Appearance and navigation behavior</string>
+    <string name="theme_section_appearance">Appearance</string>
+    <string name="theme_dark_mode">Dark mode</string>
+    <string name="theme_amoled">Pure black background in dark mode</string>
+    <string name="theme_use_monet">Use Monet colors</string>
+    <string name="theme_color_spec">Color spec</string>
+    <string name="theme_color_spec_2021">Material 3 2021</string>
+    <string name="theme_color_spec_2025">Material 3 2025</string>
+    <string name="theme_color_spec_unsupported">This palette style has no 2025 variant</string>
+    <string name="theme_accent_color">Accent color</string>
+    <string name="theme_accent_default">Default</string>
+    <string name="theme_color_source">Color source</string>
+    <string name="theme_dark_mode_system">Follow system</string>
+    <string name="theme_dark_mode_light">Light</string>
+    <string name="theme_dark_mode_dark">Dark</string>
+    <string name="theme_color_source_default">Default colors</string>
+    <string name="theme_color_source_default_summary">Use the built-in Miuix palette</string>
+    <string name="theme_color_source_monet">Dynamic color (Monet)</string>
+    <string name="theme_color_source_monet_summary">Follow the system wallpaper colors</string>
+    <string name="theme_color_source_custom">Custom color</string>
+    <string name="theme_color_source_custom_summary">Generate the palette from a picked seed color</string>
+    <string name="theme_custom_color">Seed color</string>
+    <string name="theme_palette_style">Palette style</string>
+    <string name="theme_palette_tonal_spot">Tonal spot</string>
+    <string name="theme_palette_neutral">Neutral</string>
+    <string name="theme_palette_vibrant">Vibrant</string>
+    <string name="theme_palette_expressive">Expressive</string>
+    <string name="theme_palette_rainbow">Rainbow</string>
+    <string name="theme_palette_fruit_salad">Fruit salad</string>
+    <string name="theme_palette_monochrome">Monochrome</string>
+    <string name="theme_palette_fidelity">Fidelity</string>
+    <string name="theme_palette_content">Content</string>
     <string name="theme_enable_blur">Blur</string>
     <string name="theme_enable_blur_summary">Use blurred surfaces where supported</string>
     <string name="theme_floating_bottom_bar">Floating bottom bar</string>
@@ -84,6 +140,13 @@
     <string name="theme_enable_glass_summary">Apply a translucent glass effect to the floating bottom bar</string>
     <string name="theme_navigation_badge">Navigation badge</string>
     <string name="theme_navigation_badge_summary">Show the number of apps that can be updated</string>
+    <string name="theme_section_navigation">Navigation items</string>
+    <string name="theme_tab_today_summary">Show Today recommendations and articles</string>
+    <string name="theme_tab_games_summary">Browse games and rankings</string>
+    <string name="theme_tab_apps_summary">Browse apps and rankings</string>
+    <string name="theme_tab_updates_summary">Show app update status and history</string>
+    <string name="theme_tab_search_summary">Search applications across sources</string>
+    <string name="theme_section_interaction">Interaction</string>
     <string name="theme_predictive_back">Predictive back</string>
     <string name="theme_predictive_back_summary">Enable predictive back gestures</string>
     <string name="theme_page_scale">Interface scale</string>
@@ -91,6 +154,13 @@
     <string name="theme_page_scale_range">80% - 110%</string>
     <string name="home_page">Home page</string>
     <string name="home_page_summary">Page opened on launch</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Application display language</string>
+    <string name="language_system">System default</string>
+    <string name="language_zh_tw">Chinese (Taiwan)</string>
+    <string name="language_zh_hk">Chinese (Hong Kong)</string>
+    <string name="language_zh_cn">Chinese Simplified</string>
+    <string name="language_en">English</string>
     <string name="remove_search_ads">Remove promoted apps</string>
     <string name="remove_search_ads_summary">Applies to the current search source. Hide promoted results.</string>
     <string name="filter_quick_games">Remove quick apps</string>
@@ -99,6 +169,11 @@
     <string name="filter_reservation_apps_summary">Applies to the current search source. Hide unreleased pre-order apps.</string>
     <string name="strip_name_subtitle">Simplify app names</string>
     <string name="strip_name_subtitle_summary">Remove promotional text from app names; parts of the actual name may be removed by mistake.</string>
+    <string name="clipboard_link_detect">Detect store links in clipboard</string>
+    <string name="clipboard_link_detect_summary">Offer to open a store link found in the clipboard when you launch the app</string>
+    <string name="clipboard_link_title">Open this store link?</string>
+    <string name="clipboard_link_message">Your clipboard has a link to an app on %1$s: %2$s</string>
+    <string name="clipboard_link_generic_source">another store</string>
     <string name="search_ad_tag">Promoted</string>
     <string name="search_quickapp_tag">Quick app</string>
     <string name="search_sources">Search sources</string>
@@ -107,6 +182,9 @@
     <string name="update_source_summary">Used to check for app updates</string>
     <string name="today_source">Today source</string>
     <string name="today_source_summary">Used for Today page content</string>
+    <string name="category_source">Games &amp; Apps source</string>
+    <string name="category_source_summary">Content source for the Games and Apps pages</string>
+    <string name="update_system_app_standard_hint">System apps may be rejected by standard install. Switch to Root or Shizuku in installer settings</string>
     <string name="source_xiaomi">Xiaomi</string>
     <string name="source_vivo">vivo</string>
     <string name="source_wandoujia">Wandoujia</string>
@@ -115,6 +193,12 @@
     <string name="source_honor">Honor</string>
     <string name="source_huawei">Huawei</string>
     <string name="source_taptap">TapTap</string>
+    <string name="source_box7723">7723</string>
+    <string name="source_fdroid">F-Droid</string>
+    <string name="fdroid_mirror">F-Droid mirror</string>
+    <string name="fdroid_mirror_summary">Choose the domestic mirror used for downloading F-Droid apps</string>
+    <string name="fdroid_mirror_nju">Nanjing University (NJU)</string>
+    <string name="fdroid_mirror_tuna">Tsinghua University (TUNA)</string>
     <string name="historical_versions">Historical versions</string>
     <string name="historical_versions_summary">View all versions</string>
     <string name="historical_versions_title">%1$s versions</string>
@@ -144,9 +228,6 @@
     <string name="profile_source_preset">Preset</string>
     <string name="profile_source_device">From device</string>
     <string name="profile_source_current_device">From current device</string>
-    <string name="profile_store_region">Store region</string>
-    <string name="profile_store_region_china">China</string>
-    <string name="profile_store_region_global">Global</string>
     <string name="profile_save_template">Save as template</string>
     <string name="profile_delete_template_confirm">Delete template "%1$s"?</string>
     <string name="profile_template_name">Template name</string>
@@ -165,6 +246,18 @@
     <string name="installer_pick">Choose package installer</string>
     <string name="installer_pick_hint">Choose an app</string>
     <string name="installer_none">No package installer is available</string>
+    <string name="installer_attribution">Installer attribution</string>
+    <string name="installer_attribution_summary">Spoof installer package identity during installation</string>
+    <string name="installer_attribution_auto">Auto by source (Recommended)</string>
+    <string name="installer_attribution_auto_summary">Use official store for vendor sources, Google Play for others</string>
+    <string name="installer_attribution_google_play">Google Play</string>
+    <string name="installer_attribution_google_play_summary">Always use com.android.vending</string>
+    <string name="installer_attribution_custom">Custom package</string>
+    <string name="installer_attribution_custom_summary">Use custom package name (%1$s)</string>
+    <string name="installer_attribution_none">None</string>
+    <string name="installer_attribution_none_summary">Use AppMarket package name</string>
+    <string name="installer_attribution_custom_title">Custom installer package</string>
+    <string name="installer_attribution_custom_hint">e.g. com.android.vending</string>
     <string name="install_permission_title">Installation permission required</string>
     <string name="install_permission_message">Allow this app to install unknown apps before continuing.</string>
     <string name="install_permission_settings_unavailable">Unable to open installation permission settings</string>
@@ -181,6 +274,8 @@
     <string name="installer_delta_fallback_toast">Delta update failed for %1$s, downloading full package: %2$s</string>
     <string name="installer_save_to_downloads">Save to Download</string>
     <string name="installer_save_to_downloads_summary">Also save the package to the system Download folder</string>
+    <string name="installer_auto_launch_confirm">Open install confirmation automatically</string>
+    <string name="installer_auto_launch_confirm_summary">Pull up the system installer as soon as it is ready; turn off to only show a notification</string>
     <string name="installer_no_user_action">No user confirmation</string>
     <string name="installer_no_user_action_summary">Try to install apps without user interaction</string>
     <string name="installer_delete_after_install">Delete APK after installation</string>
@@ -233,6 +328,7 @@
     <string name="about">About</string>
     <string name="about_summary">Version info and project link</string>
     <string name="about_title">About</string>
+    <string name="about_project">Project repository</string>
     <string name="about_open_source_licenses">Open source licenses</string>
 
     <!-- Update history -->
@@ -242,6 +338,8 @@
     <string name="saved_packages_summary">Manage downloaded APK installers</string>
     <string name="no_saved_packages">No saved installers</string>
     <string name="settings_section_download_install">Downloads &amp; installs</string>
+    <string name="settings_search">Search settings</string>
+    <string name="settings_search_no_results">No matching settings</string>
     <string name="downloading_apps">Active downloads</string>
     <string name="downloading_apps_summary">View and manage in-progress downloads</string>
     <string name="downloading_apps_empty">No download tasks</string>
