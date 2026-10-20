@@ -1,0 +1,76 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # 每天 UTC 03:00 (北京时间 11:00) 自动执行
+    - cron: '0 3 * * *'
+  workflow_dispatch: # 支持随时在 GitHub 页面手动点击运行
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Sync and Trigger Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch and Sync from HSSkyBoy/AppMarket
+        id: sync_step
+        run: |
+          git remote add upstream https://github.com/HSSkyBoy/AppMarket.git 2>/dev/null || git remote set-url upstream https://github.com/HSSkyBoy/AppMarket.git
+          git fetch upstream main
+
+          LOCAL_HEAD=$(git rev-parse HEAD)
+          UPSTREAM_HEAD=$(git rev-parse upstream/main)
+
+          echo "Local HEAD:    $LOCAL_HEAD"
+          echo "Upstream HEAD: $UPSTREAM_HEAD"
+
+          # 检查 upstream/main 是否有新提交未合入
+          BEHIND_COUNT=$(git rev-list --count HEAD..upstream/main)
+          echo "Behind upstream by $BEHIND_COUNT commits"
+
+          if [ "$BEHIND_COUNT" -eq 0 ]; then
+            echo "Already up to date with upstream."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Merging upstream changes..."
+          # 尝试合入 upstream/main，若产生冲突自动优先采用 upstream 的版本，同时保护 sync 配置文件
+          git merge upstream/main -m "chore: sync upstream from HSSkyBoy/AppMarket" || {
+            echo "Conflict detected, resolving by accepting upstream changes..."
+            git checkout --theirs .
+            git add .
+            git commit -m "chore: sync upstream from HSSkyBoy/AppMarket (auto-resolved conflicts)"
+          }
+
+          # 确保当前 sync 工作流文件不被覆盖删除
+          git checkout HEAD -- .github/workflows/sync-upstream.yml 2>/dev/null || true
+
+          git push origin main
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Trigger Build Workflow
+        if: steps.sync_step.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Changes detected and pushed. Triggering 'CI & Release' build..."
+          gh workflow run "CI & Release" --ref main

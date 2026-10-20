@@ -10,6 +10,7 @@ on:
       - "README.md"
       - "doc/*"
       - ".github/workflows/build.yml"
+      - ".github/workflows/sync-upstream.yml"
 
 jobs:
   build-android:
