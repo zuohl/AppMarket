@@ -6,6 +6,8 @@ import top.app.market.data.local.PreferencesDataSourceImpl
 import top.app.market.data.platform.DesktopThemePlatformPreferences
 import top.app.market.data.platform.ThemePlatformPreferences
 import top.app.market.data.platform.createHttpClient
+import top.app.market.data.remote.fdroid.FDroidIndexSource
+import top.app.market.data.remote.fdroid.JvmFDroidIndexSource
 import top.app.market.data.remote.xiaomi.platform.DesktopDeviceDefaultsDataSource
 import top.app.market.data.remote.xiaomi.platform.DesktopXiaomiDeviceIdentityDataSource
 import top.app.market.data.remote.xiaomi.platform.DeviceDefaultsDataSource
@@ -28,9 +30,13 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import java.io.File
 
 internal actual val platformDataModule: Module = module {
     single { createHttpClient() }
+    single<FDroidIndexSource> {
+        JvmFDroidIndexSource(get(), File(System.getProperty("user.home"), ".app-market/cache"))
+    }
     singleOf(::PreferencesDataSourceImpl) { bind<PreferencesDataSource>() }
     singleOf(::DesktopThemePlatformPreferences) { bind<ThemePlatformPreferences>() }
     singleOf(::DesktopDeviceDefaultsDataSource) { bind<DeviceDefaultsDataSource>() }
