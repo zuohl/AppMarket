@@ -73,4 +73,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Changes detected and pushed. Triggering 'CI & Release' build..."
-          gh workflow run "CI & Release" --ref main
+          gh workflow run "CI & Release" --repo "${{ github.repository }}" --ref main
