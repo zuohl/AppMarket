@@ -10,155 +10,56 @@ import top.app.market.domain.model.market.MarketAppInfo
 import top.app.market.domain.model.market.ScreenshotOrientation
 import top.app.market.domain.model.market.SearchPage
 import top.app.market.domain.model.preference.FDroidMirror
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
-import io.ktor.http.encodeURLParameter
-import io.ktor.http.isSuccess
 
-internal data class FDroidApiConfig(
-    val searchBaseUrl: String = "https://search.f-droid.org",
-    val packageBaseUrl: String = "https://f-droid.org/en/packages",
-)
-
-private const val DefaultPageLimit = 20
-private const val UserAgent =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-
+private const val SearchPageSize = 20
+private val Whitespace = Regex("""\s+""")
 private val HtmlTag = Regex("<[^>]+>")
-private val SearchItemPattern = Regex(
-    """<a class="package-header" href="https://f-droid\.org/en/packages/([^"/]+)">\s*<img class="package-icon" src="([^"]+)"\s*/>\s*<div class="package-info">\s*<h4 class="package-name">\s*([\s\S]*?)\s*</h4>\s*<div class="package-desc">\s*<span class="package-summary">([\s\S]*?)</span>""",
-    RegexOption.MULTILINE
-)
-private val PackageTitlePattern = Regex("""<h3 class="package-name">\s*([\s\S]*?)\s*</h3>""")
-private val PackageIconPattern = Regex("""<img class="package-icon" src="([^"]+)"[^>]*alt="package icon"""")
-private val PackageSummaryPattern = Regex("""<div class="package-summary">\s*([\s\S]*?)\s*</div>""")
-private val PackageDescPattern = Regex("""<div class="package-description"[^>]*>([\s\S]*?)</div>""")
-private val PackageWhatsNewPattern = Regex("""<div class="package-whats-new"[^>]*>[\s\S]*?<div dir="auto">\s*([\s\S]*?)\s*</div>""")
-private val ScreenshotPattern = Regex("""<li class="js_slide screenshot"><img src="([^"]+)"""")
-private val PackageVersionHeaderPattern = Regex(
-    """<b>Version\s+([^<]+)</b>\s*\((\d+)\)[\s\S]*?<p class="package-version-download">\s*<b>\s*<a href="([^"]+)"""",
-    RegexOption.MULTILINE
-)
-private val DownloadSizePattern = Regex("""</a>\s*</b>\s*([0-9.]+\s*[KMGT]?i?B)""", RegexOption.IGNORE_CASE)
 
+/**
+ * F-Droid 数据层：搜索、详情、下载地址全部基于镜像源的仓库索引在本地完成，
+ * 不访问 f-droid.org 官网，这样镜像源可用时整条链路都可用。
+ */
 internal class FDroidApi(
-    private val client: HttpClient,
-    private val config: FDroidApiConfig = FDroidApiConfig(),
+    private val index: FDroidIndexSource,
 ) {
     /**
-     * 搜索 F-Droid 开源应用。
+     * 搜索 F-Droid 开源应用。关键词按空白切分，所有词都需出现在包名 / 名称 / 简介中。
      */
     suspend fun search(keyword: String, page: Int = 0, mirror: FDroidMirror = FDroidMirror.Default): SearchPage {
-        val query = keyword.trim()
-        if (query.isBlank()) return SearchPage(emptyList(), hasMore = false)
+        val query = keyword.trim().lowercase()
+        val tokens = query.split(Whitespace).filter { it.isNotEmpty() }
+        if (tokens.isEmpty()) return SearchPage(emptyList(), hasMore = false)
 
-        val pageNumber = page + 1 // F-Droid 搜索页从 1 开始
-        val url = "${config.searchBaseUrl}/?q=${query.encodeURLParameter()}&page=$pageNumber"
+        val matches = index.load(mirror).apps
+            .filter { app -> tokens.all { app.searchKey.contains(it) } }
+            .sortedWith(compareBy<FDroidIndexApp> { matchRank(it, query) }.thenByDescending { it.lastUpdated })
 
-        val response = client.get(url) {
-            header(HttpHeaders.UserAgent, UserAgent)
-        }
-
-        if (!response.status.isSuccess()) {
-            throw MarketException("F-Droid 搜索请求失败：HTTP ${response.status.value}")
-        }
-
-        val html = response.bodyAsText()
-        val apps = mutableListOf<MarketAppInfo>()
-
-        SearchItemPattern.findAll(html).forEach { match ->
-            val pkg = match.groupValues[1].trim()
-            val rawIcon = match.groupValues[2].trim()
-            val name = cleanHtml(match.groupValues[3])
-            val summary = cleanHtml(match.groupValues[4])
-
-            val iconUrl = replaceWithMirror(rawIcon, mirror)
-            val appId = pkg.hashCode().toLong()
-
-            apps.add(
-                MarketAppInfo(
-                    appId = appId,
-                    packageName = pkg,
-                    displayName = name.ifBlank { pkg },
-                    publisherName = "",
-                    versionName = "",
-                    versionCode = 0L,
-                    icon = iconUrl,
-                    apkSize = 0L,
-                    ratingScore = 0.0,
-                    changeLog = summary,
-                    openLink = "https://f-droid.org/en/packages/$pkg/",
-                    source = AppSource.FDROID,
-                )
-            )
-        }
-
-        // 检查是否有下一页
-        val nextPageParam = "page=${pageNumber + 1}"
-        val hasMore = html.contains(nextPageParam) && apps.isNotEmpty()
-
-        return SearchPage(items = apps, hasMore = hasMore)
+        val from = page * SearchPageSize
+        val items = matches.drop(from).take(SearchPageSize).map { toMarketAppInfo(it, mirror) }
+        return SearchPage(items = items, hasMore = matches.size > from + SearchPageSize)
     }
 
     /**
-     * 获取应用详情（提取应用名、图标、描述、更新日志、截图、最新版本与下载链接）。
+     * 获取应用详情（名称、图标、描述、更新日志、截图、最新版本）。
      */
     suspend fun appDetail(packageName: String, mirror: FDroidMirror = FDroidMirror.Default): AppDetail {
         val pkg = packageName.trim()
-        val url = "${config.packageBaseUrl}/$pkg/"
+        val app = index.load(mirror).find(pkg) ?: throw MarketException("F-Droid 未找到该应用：$pkg")
+        val summary = app.summary
+        val whatsNew = app.whatsNew
+        val description = cleanHtml(app.description)
 
-        val response = client.get(url) {
-            header(HttpHeaders.UserAgent, UserAgent)
+        // 截图优先中文版；中文没有截图时回落到英文
+        val shotsText = app.zh?.takeIf { it.screenshots.isNotEmpty() } ?: app.en
+        val screenshots = shotsText?.screenshots.orEmpty().map { file ->
+            AppScreenshot(
+                url = "${mirror.repoBaseUrl}/$pkg/${shotsText?.locale}/phoneScreenshots/$file",
+                orientation = ScreenshotOrientation.PORTRAIT,
+            )
         }
-
-        if (!response.status.isSuccess()) {
-            throw MarketException("F-Droid 详情请求失败：HTTP ${response.status.value}")
-        }
-
-        val html = response.bodyAsText()
-
-        val displayName = PackageTitlePattern.find(html)?.groupValues?.get(1)?.let(::cleanHtml).orEmpty().ifBlank { pkg }
-        val rawIcon = PackageIconPattern.find(html)?.groupValues?.get(1).orEmpty()
-        val iconUrl = replaceWithMirror(rawIcon, mirror)
-
-        val summary = PackageSummaryPattern.find(html)?.groupValues?.get(1)?.let(::cleanHtml).orEmpty()
-        val description = PackageDescPattern.find(html)?.groupValues?.get(1)?.let(::cleanHtml).orEmpty()
-        val whatsNew = PackageWhatsNewPattern.find(html)?.groupValues?.get(1)?.let(::cleanHtml).orEmpty()
-
-        // 截图
-        val screenshots = ScreenshotPattern.findAll(html).map { match ->
-            val screenshotUrl = replaceWithMirror(match.groupValues[1], mirror)
-            AppScreenshot(url = screenshotUrl, orientation = ScreenshotOrientation.PORTRAIT)
-        }.toList()
-
-        // 解析版本列表，取最新的 suggested 或第一个版本
-        val versionMatch = PackageVersionHeaderPattern.find(html)
-        val versionName = versionMatch?.groupValues?.get(1)?.trim().orEmpty()
-        val versionCode = versionMatch?.groupValues?.get(2)?.toLongOrNull() ?: 1L
-        val rawDownloadUrl = versionMatch?.groupValues?.get(3)?.trim().orEmpty()
-
-        val downloadSize = DownloadSizePattern.find(html)?.groupValues?.get(1)?.let(::parseDisplaySize) ?: 0L
-
-        val appInfo = MarketAppInfo(
-            appId = pkg.hashCode().toLong(),
-            packageName = pkg,
-            displayName = displayName,
-            publisherName = "",
-            versionName = versionName,
-            versionCode = versionCode,
-            icon = iconUrl,
-            apkSize = downloadSize,
-            ratingScore = 0.0,
-            changeLog = whatsNew.ifBlank { summary },
-            openLink = url,
-            source = AppSource.FDROID,
-        )
 
         return AppDetail(
-            app = appInfo,
+            app = toMarketAppInfo(app, mirror).copy(changeLog = whatsNew.ifBlank { summary }),
             brief = summary,
             introduction = description.ifBlank { summary },
             changeLog = whatsNew,
@@ -174,46 +75,63 @@ internal class FDroidApi(
     }
 
     /**
-     * 获取 APK 下载直链（映射到用户选择的国内镜像源）。
+     * 获取 APK 下载直链（指向用户选择的国内镜像源）。
      */
     suspend fun downloadMeta(app: MarketAppInfo, mirror: FDroidMirror = FDroidMirror.Default): DownloadMeta {
-        // 先检查 app 是否已经带了有效版本，如果没有或者没有下载文件名，通过 appDetail 获取
-        val detailUrl = "${config.packageBaseUrl}/${app.packageName}/"
-        val response = client.get(detailUrl) {
-            header(HttpHeaders.UserAgent, UserAgent)
-        }
-
-        if (!response.status.isSuccess()) {
-            throw MarketException("F-Droid 解析下载地址失败：HTTP ${response.status.value}")
-        }
-
-        val html = response.bodyAsText()
-        val versionMatch = PackageVersionHeaderPattern.find(html)
+        val entry = index.load(mirror).find(app.packageName)
+            ?.takeIf { it.apkName.isNotBlank() }
             ?: throw MarketException("F-Droid 未找到该应用的有效版本下载")
-
-        val versionName = versionMatch.groupValues[1].trim().ifBlank { app.versionName }
-        val versionCode = versionMatch.groupValues[2].toLongOrNull() ?: app.versionCode.takeIf { it > 0 } ?: 1L
-        val rawDownloadUrl = versionMatch.groupValues[3].trim()
-
-        val downloadSize = DownloadSizePattern.find(html)?.groupValues?.get(1)?.let(::parseDisplaySize)
-            ?: app.apkSize
-
-        val finalDownloadUrl = replaceWithMirror(rawDownloadUrl, mirror)
 
         return fdroidDownloadMeta(
             appId = app.appId,
-            packageName = app.packageName,
-            displayName = app.displayName,
-            versionName = versionName,
-            versionCode = versionCode,
-            icon = replaceWithMirror(app.icon, mirror),
-            downloadUrl = finalDownloadUrl,
-            fallbackSize = downloadSize,
+            packageName = entry.packageName,
+            displayName = app.displayName.ifBlank { entry.displayName },
+            versionName = entry.versionName.ifBlank { app.versionName },
+            versionCode = entry.versionCode.takeIf { it > 0 } ?: app.versionCode.takeIf { it > 0 } ?: 1L,
+            icon = iconUrl(entry, mirror),
+            downloadUrl = "${mirror.repoBaseUrl}/${entry.apkName}",
+            fallbackSize = entry.apkSize.takeIf { it > 0 } ?: app.apkSize,
         )
     }
 
+    /** 名称完全匹配 > 名称前缀 > 名称包含 > 包名包含 > 仅简介命中。 */
+    private fun matchRank(app: FDroidIndexApp, query: String): Int {
+        val names = listOfNotNull(app.zh?.name, app.en?.name).map { it.lowercase() }
+        return when {
+            names.any { it == query } -> 0
+            names.any { it.startsWith(query) } -> 1
+            names.any { it.contains(query) } -> 2
+            app.packageName.lowercase().contains(query) -> 3
+            else -> 4
+        }
+    }
+
+    private fun toMarketAppInfo(app: FDroidIndexApp, mirror: FDroidMirror): MarketAppInfo =
+        MarketAppInfo(
+            appId = app.packageName.hashCode().toLong(),
+            packageName = app.packageName,
+            displayName = app.displayName,
+            publisherName = "",
+            versionName = app.versionName,
+            versionCode = app.versionCode,
+            icon = iconUrl(app, mirror),
+            apkSize = app.apkSize,
+            ratingScore = 0.0,
+            changeLog = app.summary,
+            openLink = "https://f-droid.org/en/packages/${app.packageName}/",
+            source = AppSource.FDROID,
+        )
+
+    private fun iconUrl(app: FDroidIndexApp, mirror: FDroidMirror): String {
+        if (app.icon.isNotBlank()) return "${mirror.repoBaseUrl}/icons-640/${app.icon}"
+        val text = listOfNotNull(app.zh, app.en).firstOrNull { it.icon.isNotBlank() } ?: return ""
+        return "${mirror.repoBaseUrl}/${app.packageName}/${text.locale}/${text.icon}"
+    }
+
+    /** 索引里的描述是简化 HTML（`<b>`、`<ul>` 等），详情页按纯文本展示。 */
     private fun cleanHtml(raw: String): String =
-        HtmlTag.replace(raw, "")
+        raw.replace("</li>", "\n").replace("<li>", "• ")
+            .let { HtmlTag.replace(it, "") }
             .replace("&amp;", "&")
             .replace("&lt;", "<")
             .replace("&gt;", ">")
@@ -221,37 +139,6 @@ internal class FDroidApi(
             .replace("&#39;", "'")
             .replace("&#x27;", "'")
             .trim()
-
-    internal fun replaceWithMirror(rawUrl: String, mirror: FDroidMirror): String {
-        if (rawUrl.isBlank()) return ""
-        // 将任何官方 host 替换为用户配置的镜像源 baseUrl (e.g. https://mirror.nju.edu.cn/fdroid/repo)
-        // 典型 F-Droid 资源格式:
-        // https://f-droid.org/repo/xxx
-        // https://ftp.fau.de/fdroid/repo/xxx
-        // /repo/xxx
-        val repoPrefix = Regex("""^(https?://[^/]+)?/repo/""")
-        return if (repoPrefix.containsMatchIn(rawUrl)) {
-            rawUrl.replace(repoPrefix, "${mirror.repoBaseUrl}/")
-        } else if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
-            rawUrl
-        } else {
-            "${mirror.repoBaseUrl}/${rawUrl.trimStart('/')}"
-        }
-    }
-
-    private fun parseDisplaySize(text: String): Long {
-        val trimmed = text.trim()
-        val match = Regex("""([0-9.]+)\s*([KMGT]?i?B)""", RegexOption.IGNORE_CASE).find(trimmed) ?: return 0L
-        val value = match.groupValues[1].toDoubleOrNull() ?: return 0L
-        val unit = match.groupValues[2].uppercase()
-        val factor = when {
-            unit.startsWith("G") -> 1024L * 1024L * 1024L
-            unit.startsWith("M") -> 1024L * 1024L
-            unit.startsWith("K") -> 1024L
-            else -> 1L
-        }
-        return (value * factor).toLong()
-    }
 }
 
 internal fun fdroidDownloadMeta(

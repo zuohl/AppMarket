@@ -1,5 +1,6 @@
 ﻿package top.app.market.di
 
+import android.content.Context
 import top.app.market.data.download.PlatformDownloadDataSource
 import top.app.market.data.install.AndroidInstallRepositoryImpl
 import top.app.market.data.install.DeltaFallbackBus
@@ -27,6 +28,8 @@ import top.app.market.data.local.PreferencesDataSourceImpl
 import top.app.market.data.platform.AndroidThemePlatformPreferences
 import top.app.market.data.platform.ThemePlatformPreferences
 import top.app.market.data.platform.createAndroidHttpClient
+import top.app.market.data.remote.fdroid.FDroidIndexSource
+import top.app.market.data.remote.fdroid.JvmFDroidIndexSource
 import top.app.market.data.remote.xiaomi.platform.AndroidDeviceDefaultsDataSource
 import top.app.market.data.remote.xiaomi.platform.AndroidInstalledApkHashRepositoryImpl
 import top.app.market.data.remote.xiaomi.platform.AndroidInstalledPackagesRepositoryImpl
@@ -52,6 +55,7 @@ import org.koin.dsl.module
 
 internal actual val platformDataModule: Module = module {
     single { createAndroidHttpClient() }
+    single<FDroidIndexSource> { JvmFDroidIndexSource(get(), get<Context>().cacheDir) }
     singleOf(::PreferencesDataSourceImpl) { bind<PreferencesDataSource>() }
     singleOf(::AndroidThemePlatformPreferences) { bind<ThemePlatformPreferences>() }
     singleOf(::AndroidDeviceDefaultsDataSource) { bind<DeviceDefaultsDataSource>() }

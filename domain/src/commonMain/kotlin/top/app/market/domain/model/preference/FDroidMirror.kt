@@ -14,6 +14,11 @@ enum class FDroidMirror(
         token = "tuna",
         displayName = "清华大学开源软件镜像站 (TUNA)",
         repoBaseUrl = "https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo",
+    ),
+    OFFICIAL(
+        token = "official",
+        displayName = "F-Droid 官方源",
+        repoBaseUrl = "https://f-droid.org/repo",
     );
 
     companion object {

@@ -149,6 +149,7 @@ import top.app.market.resources.theme_summary
 import top.app.market.domain.model.preference.FDroidMirror
 import top.app.market.resources.fdroid_mirror
 import top.app.market.resources.fdroid_mirror_nju
+import top.app.market.resources.fdroid_mirror_official
 import top.app.market.resources.fdroid_mirror_summary
 import top.app.market.resources.fdroid_mirror_tuna
 import top.app.market.resources.category_source
@@ -375,6 +376,7 @@ fun SettingsTab(
                         val mirrorLabels = listOf(
                             stringResource(Res.string.fdroid_mirror_nju),
                             stringResource(Res.string.fdroid_mirror_tuna),
+                            stringResource(Res.string.fdroid_mirror_official),
                         )
                         WindowDropdownPreference(
                             title = stringResource(Res.string.fdroid_mirror),
@@ -801,6 +803,7 @@ private fun settingsSearchEntries(
             val mirrorLabels = listOf(
                 stringResource(Res.string.fdroid_mirror_nju),
                 stringResource(Res.string.fdroid_mirror_tuna),
+                stringResource(Res.string.fdroid_mirror_official),
             )
             add(
                 SettingsSearchEntry.Dropdown(
