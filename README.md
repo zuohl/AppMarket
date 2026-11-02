@@ -1,4 +1,4 @@
-# AppMarket
+﻿# AppMarket
 
 基于 **Kotlin Multiplatform** 的现代化跨平台应用商店，支持 **Android** 与 **Desktop (JVM)**。采用 **miuix** 设计语言，拥有流畅优雅的视觉交互，聚合多家主流应用源。
 
@@ -280,5 +280,5 @@ AppMarket 能解析各家应用商店的应用详情链接，并在应用内打�
 ## 开源许可
 
 本项目基于 [Apache License 2.0](LICENSE) 许可证开源。
-Copyright (c) 2026 Neko Beillc (HSSkyBoy) & AppMarket contributors.
+Copyright (c) 2026 Neko Beillc (Nk-Be) & AppMarket contributors.
 

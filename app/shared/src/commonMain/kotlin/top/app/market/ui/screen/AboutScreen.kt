@@ -343,8 +343,8 @@ private fun AboutContent(
                     Card(modifier = cardModifier, colors = cardColors) {
                         ArrowPreference(
                             title = "GitHub",
-                            summary = "github.com/HSSkyBoy/AppMarket",
-                            onClick = { onOpenUrl("https://github.com/HSSkyBoy/AppMarket") },
+                            summary = "github.com/Nk-Be/AppMarket",
+                            onClick = { onOpenUrl("https://github.com/Nk-Be/AppMarket") },
                         )
                     }
                     SectionTitle(text = stringResource(Res.string.about_open_source_licenses))
