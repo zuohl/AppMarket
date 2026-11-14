@@ -5,11 +5,13 @@ import top.app.market.domain.model.market.AppSource
 import top.app.market.resources.Res
 import top.app.market.resources.source_box7723
 import top.app.market.resources.source_fdroid
+import top.app.market.resources.source_google_play
 import top.app.market.resources.source_honor
 import top.app.market.resources.source_huawei
 import top.app.market.resources.source_oppo
 import top.app.market.resources.source_samsung
 import top.app.market.resources.source_taptap
+import top.app.market.resources.source_tencent
 import top.app.market.resources.source_vivo
 import top.app.market.resources.source_wandoujia
 import top.app.market.resources.source_xiaomi
@@ -27,4 +29,6 @@ fun appSourceLabel(source: AppSource): String = when (source) {
     AppSource.TAPTAP -> stringResource(Res.string.source_taptap)
     AppSource.BOX7723 -> stringResource(Res.string.source_box7723)
     AppSource.FDROID -> stringResource(Res.string.source_fdroid)
+    AppSource.GOOGLE_PLAY -> stringResource(Res.string.source_google_play)
+    AppSource.TENCENT -> stringResource(Res.string.source_tencent)
 }

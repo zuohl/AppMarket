@@ -2,6 +2,8 @@
 
 基于 **Kotlin Multiplatform** 的现代化跨平台应用商店，支持 **Android** 与 **Desktop (JVM)**。采用 **miuix** 设计语言，拥有流畅优雅的视觉交互，聚合多家主流应用源。
 
+> 本项目基于原项目二次开发，原版链接：[YXBwbWFya2V0/AppMarket](https://github.com/YXBwbWFya2V0/AppMarket)
+
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.0-blue?logo=jetpackcompose)](https://github.com/JetBrains/compose-multiplatform)
 [![miuix](https://img.shields.io/badge/UI-miuix-FF6900.svg)](https://github.com/compose-miuix-ui/miuix)
@@ -76,17 +78,33 @@
 | **三星应用商店** (Samsung) |  `samsung`  |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
 | **豌豆荚** (Wandoujia)     | `wandoujia` |     ✅      |   ✅\*   |    ❌    |    ✅    |     ❌      |    ❌     |    ❌    |    —     |
 | **7723 游戏盒** (7723)      |   `7723`    |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
-| **F-Droid** (开源镜像源)    |  `fdroid`   |     ✅      |   ✅\*   |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **F-Droid** (开源镜像源)    |  `fdroid`   |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **应用宝** (Tencent)       |  `tencent`  |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
+| **Google Play** (实验性)   | `googleplay` |     ✅      |    ✅    |    ❌    |    ❌    |     ❌      |    ❌     |    ❌    |    —     |
 
-> _\* 注：豌豆荚 / 7723 / F-Droid 无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
+> _\* 注：豌豆荚 / 7723 无原生批量更新元数据协议，更新检查时目前转发到小米源处理。_
+> _F-Droid 的更新检查在本地比对镜像索引，且仅推荐签名与本机已装版本一致的更新（F-Droid 会给 APK 重新签名）。_
 > _分区浏览（「游戏」「应用」页）无原生接口的来源会自动回退到小米官方分类。_
+
+### Google Play 与 Aurora 镜像 API
+
+Google Play 来源**不登录任何 Google 账号**，而是通过 **Aurora（极光）提供的镜像 API**（[auroraoss.com](https://auroraoss.com)）匿名换取会话令牌，再用该令牌访问 Google Play 的搜索、详情与下载接口：
+
+- 令牌发放服务由 Aurora 运营，本项目与 Aurora、Google 均无关联；应用内「关于」页同样标注了这一点。
+- 该服务不可用或被限制时，Google Play 来源会随之不可用，这是预期行为。
+- 匿名会话无法下载付费应用，也不支持评论、历史版本与分区浏览。
+- 设备资料默认模拟 Pixel 10 Pro（arm64，Android 16）。
+- 该来源为实验性功能，协议部分为独立实现，尚未经过充分的真实环境验证。
 
 ### F-Droid 镜像源与自建配置
 
-为了解决国内网络访问官方 F-Droid 缓慢或受限的问题，AppMarket 的 F-Droid 来源**默认完全使用国内优质镜像源**下载 APK 与中继数据，并在客户端「设置 - 搜索来源 - F-Droid 镜像源」中提供可视化切换：
+为了解决国内网络访问官方 F-Droid 缓慢或受限的问题，AppMarket 的 F-Droid 来源**默认使用国内优质镜像源**下载 APK 与中继数据，并在客户端「设置 - 搜索来源 - F-Droid 镜像源」中提供可视化切换：
 
 - **南京大学开源镜像站 (NJU)**：`https://mirror.nju.edu.cn/fdroid/repo`（默认推荐，CDN 加速支持）
 - **清华大学开源软件镜像站 (TUNA)**：`https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo`（权威稳定同步源）
+- **F-Droid 官方源**：`https://f-droid.org/repo`（需可直连官网）
+
+下载的 APK 会按索引中的 SHA-256 校验。
 
 #### 自行增加或修改镜像源
 
@@ -110,6 +128,11 @@ enum class FDroidMirror(
         token = "tuna",
         displayName = "清华大学开源软件镜像站 (TUNA)",
         repoBaseUrl = "https://mirrors.tuna.tsinghua.edu.cn/fdroid/repo",
+    ),
+    OFFICIAL(
+        token = "official",
+        displayName = "F-Droid 官方源",
+        repoBaseUrl = "https://f-droid.org/repo",
     ),
     // 示例：自行添加北京外国语大学或自建局域网源
     BFSU(
@@ -266,6 +289,7 @@ AppMarket 能解析各家应用商店的应用详情链接，并在应用内打�
 - [Shizuku](https://github.com/RikkaApps/Shizuku) - Android 系统级 API 免 Root 调用框架
 - [HiddenApiBypass](https://github.com/LSPosed/AndroidHiddenApiBypass) - Android 非公开 API 限制绕过方案
 - [HDiffPatch](https://github.com/sisong/HDiffPatch) - 高性能差分与补丁还原库
+- [Aurora Store](https://auroraoss.com) - Google Play 匿名会话令牌由其提供的镜像 API 发放
 - [HyperNotification](https://github.com/xzakota/HyperNotification) - 小米澎湃焦点通知与超级岛适配支持
 
 ---
@@ -273,7 +297,7 @@ AppMarket 能解析各家应用商店的应用详情链接，并在应用内打�
 ## 免责声明
 
 1. **用途限制**：本项目仅供技术研究学习及交流使用，严禁用于任何商业用途或非法牟利行为。
-2. **商标与版权**：文中提及的 Xiaomi、vivo、OPPO、Honor、Huawei、Samsung、TapTap、豌豆荚等商标及产品名称，其商标权与著作权均归其合法所有者所有。
+2. **商标与版权**：文中提及的 Xiaomi、vivo、OPPO、Honor、Huawei、Samsung、TapTap、豌豆荚、应用宝等商标及产品名称，其商标权与著作权均归其合法所有者所有。
 
 ---
 

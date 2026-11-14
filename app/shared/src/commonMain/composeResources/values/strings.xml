@@ -195,6 +195,8 @@
     <string name="source_taptap">TapTap</string>
     <string name="source_box7723">7723</string>
     <string name="source_fdroid">F-Droid</string>
+    <string name="source_google_play">Google Play</string>
+    <string name="source_tencent">Tencent MyApp</string>
     <string name="fdroid_mirror">F-Droid mirror</string>
     <string name="fdroid_mirror_summary">Choose the source used for downloading F-Droid apps</string>
     <string name="fdroid_mirror_nju">Nanjing University (NJU)</string>
@@ -331,6 +333,7 @@
     <string name="about_title">About</string>
     <string name="about_project">Project repository</string>
     <string name="about_open_source_licenses">Open source licenses</string>
+    <string name="about_aurora_summary">Google Play is accessed anonymously through the Aurora mirror API (auroraoss.com)</string>
 
     <!-- Update history -->
     <string name="update_history">Update history</string>

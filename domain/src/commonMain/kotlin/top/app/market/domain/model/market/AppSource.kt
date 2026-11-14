@@ -131,6 +131,30 @@ enum class AppSource(val token: String, val capabilities: SourceCapabilities) {
             todayFullCoverOverlay = false,
             supportsUpdates = false,
         ),
+    ),
+    TENCENT(
+        "tencent",
+        SourceCapabilities(
+            supportsComments = false,
+            supportsSameDeveloperApps = false,
+            prefersOpenLinkLaunch = true,
+            reportsDeltaSize = false,
+            supportsTodayFeed = false,
+            todayFullCoverOverlay = false,
+            supportsUpdates = true,
+        ),
+    ),
+    GOOGLE_PLAY(
+        "googleplay",
+        SourceCapabilities(
+            supportsComments = false,
+            supportsSameDeveloperApps = false,
+            prefersOpenLinkLaunch = true,
+            reportsDeltaSize = false,
+            supportsTodayFeed = false,
+            todayFullCoverOverlay = false,
+            supportsUpdates = true,
+        ),
     );
 
     companion object {

@@ -196,6 +196,8 @@
     <string name="source_taptap">TapTap</string>
     <string name="source_box7723">7723</string>
     <string name="source_fdroid">F-Droid</string>
+    <string name="source_google_play">Google Play</string>
+    <string name="source_tencent">应用宝</string>
     <string name="fdroid_mirror">F-Droid 镜像源</string>
     <string name="fdroid_mirror_summary">选择 F-Droid 应用下载与元数据所使用的源</string>
     <string name="fdroid_mirror_nju">南京大学 (NJU)</string>
@@ -332,6 +334,7 @@
     <string name="about_title">关于</string>
     <string name="about_project">项目地址</string>
     <string name="about_open_source_licenses">开放源代码许可</string>
+    <string name="about_aurora_summary">Google Play 通过 Aurora（极光）提供的镜像 API 匿名访问（auroraoss.com）</string>
 
     <!-- Update history -->
     <string name="update_history">更新历史</string>
